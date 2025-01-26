@@ -41,7 +41,7 @@ def process_message(message):
         objects = data.get("object_detection", [])
         
         # Filter objects labeled "person"
-        persons = [obj for obj in objects if obj.get("label") == "person"]
+        persons = [obj for obj in objects if obj.get("label") == "person" or obj.get("label") == "stop sign"]
         
         # Get the current time
         current_time = time.time()
