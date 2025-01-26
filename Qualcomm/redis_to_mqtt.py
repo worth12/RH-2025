@@ -15,8 +15,8 @@ PERSON_TOPIC = "detection/person"  # Replace with your MQTT topic
 FIRE_TOPIC = "detection/fire"  # Replace with your MQTT topic
 
 # Timer interval in seconds
-SEND_INTERVAL = 0.05
-last_fire_send_time = 0  # Tracks the last time a message was sent
+SEND_INTERVAL = 1
+last_pet_send_time = 0  # Tracks the last time a message was sent
 last_person_send_time = 0  # Tracks the last time a message was sent
 
 # Initialize MQTT client
@@ -33,7 +33,7 @@ def connect_mqtt():
 
 def process_message(message):
     """Process Redis message and publish 'person' objects over MQTT."""
-    global last_fire_send_time
+    global last_pet_send_time
     global last_person_send_time
     
     try:
@@ -45,7 +45,7 @@ def process_message(message):
         
         # Filter objects labeled "person"
         persons = [obj for obj in objects if obj.get("label") == "person"]
-        fires = [obj for obj in objects if obj.get("label") == "stop sign"]
+        pets = [obj for obj in objects if obj.get("label") == "dog" or obj.get("label") == "cat"]
         
         # Get the current time
         current_time = time.time()
@@ -59,12 +59,12 @@ def process_message(message):
                 # Update the last send time
                 last_person_send_time = current_time
 
-        if len(fires) == 0:
-            if current_time - last_fire_send_time >= SEND_INTERVAL:
+        if len(pets) == 0:
+            if current_time - last_pet_send_time >= SEND_INTERVAL:
                 mqtt_client.publish(FIRE_TOPIC, " ")
-                print(f"Published to MQTT: No fire detected")
+                print(f"Published to MQTT: No pet detected")
                 # Update the last send time
-                last_fire_send_time = current_time
+                last_pet_send_time = current_time
         
         for person in persons:
             if current_time - last_person_send_time >= SEND_INTERVAL:
@@ -72,12 +72,12 @@ def process_message(message):
                 print(f"Published to MQTT: {json.dumps(person, indent=4)}")
                 # Update the last send time
                 last_person_send_time = current_time
-        for fire in fires:
-            if current_time - last_fire_send_time >= SEND_INTERVAL:
+        for fire in pets:
+            if current_time - last_pet_send_time >= SEND_INTERVAL:
                 mqtt_client.publish(FIRE_TOPIC, json.dumps(fire))
                 print(f"Published to MQTT: {json.dumps(fire, indent=4)}")
                 # Update the last send time
-                last_fire_send_time = current_time
+                last_pet_send_time = current_time
     
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
