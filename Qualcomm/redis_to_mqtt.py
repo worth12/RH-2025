@@ -1,5 +1,6 @@
 import redis
 import json
+import time
 import paho.mqtt.client as mqtt
 
 # Redis server connection details
@@ -11,6 +12,10 @@ REDIS_CHANNEL = "Detection::yolonas::0"  # Replace with your Redis channel name
 MQTT_BROKER = "10.151.99.211"  # Replace with your MQTT broker address
 MQTT_PORT = 1883  # MQTT port
 MQTT_TOPIC = "detection/person"  # Replace with your MQTT topic
+
+# Timer interval in seconds
+SEND_INTERVAL = 0.05
+last_send_time = 0  # Tracks the last time a message was sent
 
 # Initialize MQTT client
 mqtt_client = mqtt.Client()
@@ -26,6 +31,8 @@ def connect_mqtt():
 
 def process_message(message):
     """Process Redis message and publish 'person' objects over MQTT."""
+    global last_send_time
+    
     try:
         # Parse the JSON string into a Python dictionary
         data = json.loads(message)
@@ -36,10 +43,17 @@ def process_message(message):
         # Filter objects labeled "person"
         persons = [obj for obj in objects if obj.get("label") == "person"]
         
-        # Publish each "person" object to MQTT
+        # Get the current time
+        current_time = time.time()
+        
+        # Check if enough time has passed since the last send
+            # Publish each "person" object to MQTT
         for person in persons:
-            mqtt_client.publish(MQTT_TOPIC, json.dumps(person))
-            print(f"Published to MQTT: {json.dumps(person, indent=4)}")
+            if current_time - last_send_time >= SEND_INTERVAL:
+                mqtt_client.publish(MQTT_TOPIC, json.dumps(person))
+                print(f"Published to MQTT: {json.dumps(person, indent=4)}")
+                # Update the last send time
+                last_send_time = current_time
     
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
