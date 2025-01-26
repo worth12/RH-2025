@@ -11,8 +11,8 @@ REDIS_CHANNEL = "Detection::yolonas::0"  # Replace with your Redis channel name
 # MQTT server connection details
 MQTT_BROKER = "10.151.99.211"  # Replace with your MQTT broker address
 MQTT_PORT = 1883  # MQTT port
-MQTT_TOPIC = "detection/person"  # Replace with your MQTT topic
-MQTT_TOPIC = "detection/fire"  # Replace with your MQTT topic
+PERSON_TOPIC = "detection/person"  # Replace with your MQTT topic
+FIRE_TOPIC = "detection/fire"  # Replace with your MQTT topic
 
 # Timer interval in seconds
 SEND_INTERVAL = 0.05
@@ -54,27 +54,27 @@ def process_message(message):
             # Publish each "person" object to MQTT
         if len(persons) == 0:
             if current_time - last_person_send_time >= SEND_INTERVAL:
-                mqtt_client.publish(MQTT_TOPIC, " ")
+                mqtt_client.publish(PERSON_TOPIC, " ")
                 print(f"Published to MQTT: {json.dumps(persons, indent=4)}")
                 # Update the last send time
                 last_person_send_time = current_time
 
         if len(fires) == 0:
             if current_time - last_fire_send_time >= SEND_INTERVAL:
-                mqtt_client.publish(MQTT_TOPIC, " ")
+                mqtt_client.publish(FIRE_TOPIC, " ")
                 print(f"Published to MQTT: {json.dumps(fires, indent=4)}")
                 # Update the last send time
                 last_fire_send_time = current_time
         
         for person in persons:
             if current_time - last_person_send_time >= SEND_INTERVAL:
-                mqtt_client.publish(MQTT_TOPIC, json.dumps(person))
+                mqtt_client.publish(PERSON_TOPIC, json.dumps(person))
                 print(f"Published to MQTT: {json.dumps(person, indent=4)}")
                 # Update the last send time
                 last_person_send_time = current_time
         for fire in fires:
             if current_time - last_fire_send_time >= SEND_INTERVAL:
-                mqtt_client.publish(MQTT_TOPIC, json.dumps(fire))
+                mqtt_client.publish(FIRE_TOPIC, json.dumps(fire))
                 print(f"Published to MQTT: {json.dumps(fire, indent=4)}")
                 # Update the last send time
                 last_fire_send_time = current_time
