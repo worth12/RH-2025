@@ -55,14 +55,14 @@ def process_message(message):
         if len(persons) == 0:
             if current_time - last_person_send_time >= SEND_INTERVAL:
                 mqtt_client.publish(PERSON_TOPIC, " ")
-                print(f"Published to MQTT: {json.dumps(persons, indent=4)}")
+                print(f"Published to MQTT: No person detected")
                 # Update the last send time
                 last_person_send_time = current_time
 
         if len(fires) == 0:
             if current_time - last_fire_send_time >= SEND_INTERVAL:
                 mqtt_client.publish(FIRE_TOPIC, " ")
-                print(f"Published to MQTT: {json.dumps(fires, indent=4)}")
+                print(f"Published to MQTT: No fire detected")
                 # Update the last send time
                 last_fire_send_time = current_time
         
