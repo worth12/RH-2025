@@ -1,0 +1,16 @@
+Using template 'Assets/Plugins/Android\AndroidManifest.xml'
+
+android.hardware.vulkan.version was added because:
+	One of the graphics devices was Vulkan
+android.permission.INTERNET was added because:
+	System.Net.Sockets was present in:
+		Assembly-CSharp-FeaturesChecked.txt
+		Oculus.VR-FeaturesChecked.txt
+android.hardware.touchscreen.multitouch, android.hardware.touchscreen.multitouch.distinct were enabled because:
+	UnityEngine.Input::get_touches was present in:
+		Unity.RenderPipelines.Core.Runtime-FeaturesChecked.txt
+	UnityEngine.Input::GetTouch was present in:
+		UnityEngine.UI-FeaturesChecked.txt
+	UnityEngine.Input::get_touchCount was present in:
+		Unity.RenderPipelines.Core.Runtime-FeaturesChecked.txt
+		UnityEngine.UI-FeaturesChecked.txt
